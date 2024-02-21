@@ -49,7 +49,10 @@ let employees = [
     
   }
 
-
+  /**
+   * 
+   * @param {*} call Get a employee by id
+   */
   const getSalary = async (call) => {
     console.log('-------------- findByPk -----------------')
     const id = call.request.id    
@@ -61,3 +64,4 @@ let employees = [
   
   exports.paySalary = paySalary
   exports.getSalary = getSalary
+  exports.employees = employees

@@ -1,6 +1,6 @@
 const grpc = require('@grpc/grpc-js')
 const protoLoader = require('@grpc/proto-loader')
-const PROTO_PATH = __dirname + '/employee.proto'
+const PROTO_PATH = __dirname + '/proto/employee.proto'
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
     keepCase: true,
@@ -15,10 +15,10 @@ let paymentProto = grpc.loadPackageDefinition(packageDefinition).employee
 
 const client = new paymentProto.Employee('0.0.0.0:4500', grpc.credentials.createInsecure())
 let employeeIdList = [1,2,3]
-let r = client.paySalary({employeeIdList: employeeIdList})
-r.on('data', function(data) {
-    console.log(data)
-})
+// let r = client.paySalary({employeeIdList: employeeIdList})
+// r.on('data', function(data) {
+//     console.log(data)
+// })
 
 const find = client.paySalaryById({id: 3})
 find.on('data', data => {

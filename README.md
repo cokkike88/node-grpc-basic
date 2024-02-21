@@ -1,41 +1,5 @@
-# Postgress docker-compose
-```
-version: '3.8'
-services:
-  db:
-    container_name: posgres
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: 123
-    restart: always
-    ports:
-      - "5432:5432"
-```
-- employee table
-```
-create table public.employee
-(
-    id         integer not null
-        constraint employee_id_pk
-            primary key,
-    email      varchar,
-    first_name varchar,
-    last_name  varchar
-);
-
-alter table public.employee
-    owner to postgres;
-```
-- employee_byte table
-```
-create table public.employee_byte (
-  id integer primary key not null,
-  data bytea
-);
-```
-
 # Run server
-- Run and fill up employee_byte table
+- Run and create data file (bytes)
 ```
 node server -s
 ```
