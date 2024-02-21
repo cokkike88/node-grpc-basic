@@ -19,3 +19,8 @@ let r = client.paySalary({employeeIdList: employeeIdList})
 r.on('data', function(data) {
     console.log(data)
 })
+
+const find = client.paySalaryById({id: 3})
+find.on('data', data => {
+    console.log(data)
+})

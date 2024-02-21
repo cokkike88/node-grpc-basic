@@ -1,3 +1,7 @@
+const _ = require('lodash');
+const protobufjs = require('protobufjs');
+const { convertEmployeeEntityFromBytes } = require('./core/convertDataToBytes')
+
 let employees = [
     {
       id: 1,
@@ -19,11 +23,11 @@ let employees = [
     },
   ];
   
-  const _ = require('lodash');
+  
   
   function paySalary(call) {
     
-      let employeeIdList = call.request.employeeIdList;
+      let employeeIdList = call.request.employeeIdList;     
     
       _.each(employeeIdList, function (employeeId) {
         console.log("Employeed Id", employeeId);
@@ -44,5 +48,16 @@ let employees = [
       call.end();
     
   }
+
+
+  const getSalary = async (call) => {
+    console.log('-------------- findByPk -----------------')
+    const id = call.request.id    
+
+    const employee = await convertEmployeeEntityFromBytes(id)
+    call.write(employee);
+    call.end()     
+  }
   
-  exports.paySalary = paySalary;
+  exports.paySalary = paySalary
+  exports.getSalary = getSalary

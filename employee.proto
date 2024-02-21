@@ -4,6 +4,7 @@ package employee;
 
 service Employee {
     rpc paySalary (EmployeeRequest) returns (stream EmployeeResponse);
+    rpc paySalaryById (EmployeeRequestById) returns (stream EmployeeEntity);
 }
 
 message EmployeeRequest {
@@ -12,4 +13,15 @@ message EmployeeRequest {
 
 message EmployeeResponse {
     string message = 1;
+}
+
+message EmployeeRequestById {
+    int32 id  = 1;
+}
+
+message EmployeeEntity {
+    int32 id = 1;
+    string email = 2;
+    string firstName = 3;
+    string lastName = 4;
 }
