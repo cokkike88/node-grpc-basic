@@ -1,6 +1,5 @@
 const _ = require('lodash');
-const protobufjs = require('protobufjs');
-const { convertEmployeeEntityFromBytes } = require('./core/convertDataToBytes')
+const { convertEmployeeEntityFromBytes, convertEmployeeEntityFromBytesV2 } = require('./core/convertDataToBytes')
 
 let employees = [
     {
@@ -54,7 +53,7 @@ let employees = [
     console.log('-------------- findByPk -----------------')
     const id = call.request.id    
 
-    const employee = await convertEmployeeEntityFromBytes(id)
+    const employee = await convertEmployeeEntityFromBytesV2(id)
     call.write(employee);
     call.end()     
   }

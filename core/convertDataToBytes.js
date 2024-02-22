@@ -1,41 +1,39 @@
 const protobufjs = require('protobufjs')
 const path = require('path')
+const sequelize = require('../dbConnection')
+const { QueryTypes } = require('sequelize')
 const Employee = require('../models/Employee')
 const EmployeeByte = require('../models/EmployeeByte')
 
 
-const protoPath = path.join(__dirname, '../') + '/employee.proto'
+const protoPath = path.join(__dirname, '../proto/employee.proto')
 
 
 /**
  * Convert each employee from Employee table to byte using Protocol buffer
  */
 let convertEmployees = async () => {
+    const root = await protobufjs.load(protoPath)
     let employees = await Employee.findAll();
-    employees.forEach(employeeEntity => {
+    employees.forEach(async employeeEntity => {
         const employee = employeeEntity.dataValues
         console.log(employee)        
-        protobufjs.load(protoPath)
-        .then(async (root) => {
-            const response = root.lookupType('employee.EmployeeEntity')
-            const message = response.create(employee)
-            const buffer = response.encode(message).finish()
-            console.log(buffer)
+        const response = root.lookupType('employee.EmployeeEntity')
+        const message = response.create(employee)
+        const buffer = response.encode(message).finish()
+        console.log(buffer)
 
-            const newMessage = response.decode(buffer)
-            const obj = response.toObject(newMessage, {
-                longs: String,
-                enums: String,
-                bytes: String
-            })
-            console.log(obj)
-
-            const savedData = await EmployeeByte.create({id: employee.id, data: buffer})
-            console.log(`data saved: ${savedData.id}`)
-
-        }).catch((error) => {
-            console.log(error)
+        const newMessage = response.decode(buffer)
+        const obj = response.toObject(newMessage, {
+            longs: String,
+            enums: String,
+            bytes: String
         })
+        console.log(obj)
+
+        const savedData = await EmployeeByte.create({id: employee.id, data: buffer})
+        console.log(`data saved: ${savedData.id}`)
+
     });
 }
 
@@ -46,20 +44,15 @@ let convertEmployees = async () => {
  */
 let convertEmployee = (id) => {
     return new Promise(async (resolve, reject) => {
-        let employeeEntity = await Employee.findByPk(id)
+        const root = await protobufjs.load(protoPath)
+        let employeeEntity = await mployee.findByPk(id)
         let employee = employeeEntity.dataValues
-        protobufjs.load(protoPath)
-        .then(async (root) => {
-            const response = root.lookupType('employee.EmployeeEntity')
-                const message = response.create(employee)
-                const buffer = response.encode(message).finish()
-                console.log(buffer)
-                return resolve(buffer)
+        const response = root.lookupType('employee.EmployeeEntity')
+        const message = response.create(employee)
+        const buffer = response.encode(message).finish()
+        console.log(buffer)
+        return resolve(buffer)
 
-        })
-        .catch(error => {
-            return reject(error)
-        })
     })    
 }
 
@@ -70,29 +63,45 @@ let convertEmployee = (id) => {
  */
 let convertEmployeeEntityFromBytes = (id) => {
     return new Promise(async (resolve, reject) => {
+        const root = await protobufjs.load(protoPath)
         const employeeByte = await EmployeeByte.findByPk(id)
-        protobufjs.load(protoPath)
-        .then(async (root) => {
-            const response = root.lookupType('employee.EmployeeEntity')
-                const buffer = employeeByte.data
-                const message = response.decode(buffer)
-                const obj = response.toObject(message, {
-                    longs: String,
-                    enums: String,
-                    bytes: String
-                })
-                return resolve(obj)
+        const response = root.lookupType('employee.EmployeeEntity')
+        const buffer = employeeByte.data
+        const message = response.decode(buffer)
+        const obj = response.toObject(message, {
+            longs: String,
+            enums: String,
+            bytes: String
+        })
+        return resolve(obj)
 
-        })
-        .catch(error => {
-            return reject(error)
-        })
     })     
 
 }
 
+let convertEmployeeEntityFromBytesV2 = (id) => {
+    return new Promise(async (resolve, reject) => {
+        const root = await protobufjs.load(protoPath)
+        const employeeByte = await sequelize.query(`SELECT * FROM employee_byte WHERE id = ${id} `, {type: QueryTypes})
+        console.log(employeeByte)
+        const response = root.lookupType('employee.EmployeeEntity')
+        const buffer = employeeByte[0].data
+        const message = response.decode(buffer)
+        const obj = response.toObject(message, {
+            longs: String,
+            enums: String,
+            bytes: String
+        })
+        return resolve(obj)
+
+    })     
+
+}
+
+
 module.exports = {
     convertEmployees,
     convertEmployee,
-    convertEmployeeEntityFromBytes
+    convertEmployeeEntityFromBytes,
+    convertEmployeeEntityFromBytesV2
 }
